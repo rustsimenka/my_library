@@ -1,4 +1,4 @@
-
+from django.http import Http404
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -16,7 +16,7 @@ class BookViewSet(ModelViewSet):
         try:
             book = self.get_object()
             return Response({f'Под id {pk} записана книга: {book.title}'})
-        except Book.DoesNotExist:
+        except Http404:
             return Response({'Книга не найдена'})
 
 

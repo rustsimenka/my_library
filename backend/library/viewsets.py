@@ -12,7 +12,7 @@ class BookViewSet(ModelViewSet):
     serializer_class = BookSerializer
 
     @action(detail=True, methods=['get'])
-    def get_name_book(self, request_id, pk=None):
+    def get_name_book(self, request, pk=None):
         try:
             book = self.get_object()
             return Response({f'Под id {pk} записана книга: {book.title}'})

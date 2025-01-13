@@ -1,8 +1,9 @@
 from django.core.management.base import BaseCommand
 from library.models import Author, Book, Reader
 
+
 class Command(BaseCommand):
-    help = 'Populate the database with sample data'
+    help = 'create_db the database with sample data'
 
     def handle(self, *args, **kwargs):
         authors_books = [

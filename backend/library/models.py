@@ -14,7 +14,7 @@ class Author(ExplicitModel):
 
 
 class Book(ExplicitModel):
-    title = models.CharField(max_length=256, null=False, unique=True)
+    title = models.CharField(max_length=256, min_lengt=4, null=False, unique=True)
     pages = models.IntegerField(null=False)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     amount_books = models.IntegerField(null=True, blank=False, default=0)

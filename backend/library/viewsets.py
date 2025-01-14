@@ -1,10 +1,11 @@
 from django.http import Http404
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-
-from library.models import Book, Author
-from library.serialiser import BookSerializer, AuthorSerializer
+from .models import Book, Author
+from .serialiser import BookSerializer, AuthorSerializer
 
 
 class BookViewSet(ModelViewSet):
@@ -17,9 +18,27 @@ class BookViewSet(ModelViewSet):
             book = self.get_object()
             return Response({f'Под id {pk} записана книга: {book.title}'})
         except Http404:
-            return Response({'Книга не найдена'})
+            return Response({'Книга не найдена'}, status=404)
 
 
 class AuthorViewSet(ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
+
+    @swagger_auto_schema(method='get', manual_parameters=[
+        openapi.Parameter('first_name', openapi.IN_QUERY, description="Имя автора",
+                          type=openapi.TYPE_STRING, required=False),
+        openapi.Parameter('surname', openapi.IN_QUERY, description="Фамилия автора",
+                          type=openapi.TYPE_STRING, required=False, default='')
+    ])
+    @action(detail=False, methods=['get'])
+    def get_authors_books(self, request):
+        first_name = request.query_params.get('first_name')
+        surname = request.query_params.get('surname')
+
+        try:
+            books = Book.objects.filter(author__first_name=first_name, author__surname=surname)
+            book_titles = [book.title for book in books]
+            return Response({f'От автора {first_name} {surname} есть книги': book_titles})
+        except Http404:
+            return Response({'Автор не найден'}, status=404)

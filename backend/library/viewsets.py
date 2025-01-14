@@ -20,6 +20,23 @@ class BookViewSet(ModelViewSet):
         except Http404:
             return Response({'Книга не найдена'}, status=404)
 
+    @swagger_auto_schema(method='get', manual_parameters=[
+        openapi.Parameter('title', openapi.IN_QUERY, description="Название книги",
+                          type=openapi.TYPE_STRING, required=False)])
+    @action(detail=False, methods=['get'])
+    def get_filter_name_book(self, request, pk=None):
+        title = request.query_params.get('title')
+
+        books = Book.objects.filter(title=title)
+        response_data = []
+
+        for book in books:
+            response_data.append({'message': f'С названием "{book.title}" есть книга автора {book.author.first_name}'
+                                             f' {book.author.surname}.'})
+        if not response_data:
+            return Response({'error': 'Книги с таким названием не найдены'}, status=404)
+        return Response(response_data)
+
 
 class AuthorViewSet(ModelViewSet):
     queryset = Author.objects.all()
